@@ -9,81 +9,89 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }
+        .hide-scroll::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-900">
+<body class="bg-gray-50 text-gray-900 hide-scroll">
 
     <div class="max-w-6xl mx-auto p-4 md:p-8">
-        <header class="flex justify-between items-center mb-10">
+        <header class="flex justify-between items-center mb-8">
             <div>
                 <h1 class="text-3xl font-bold text-blue-800">CapitalControl</h1>
-                <p class="text-gray-500">Gestão inteligente para você e sua empresa.</p>
+                <p class="text-gray-500 text-sm">Dados salvos automaticamente no dispositivo.</p>
             </div>
-            <div class="bg-blue-100 p-3 rounded-lg">
-                <span id="data-atual" class="font-semibold text-blue-700"></span>
+            <div class="bg-blue-100 p-3 rounded-lg text-center">
+                <span id="data-atual" class="font-semibold text-blue-700 block text-xs"></span>
+                <span class="text-[10px] text-blue-500 font-bold uppercase">Status: Online</span>
             </div>
         </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-green-500">
-                <p class="text-sm text-gray-500 uppercase font-bold">Total Entradas</p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border-b-4 border-green-500 transition-transform hover:scale-105">
+                <p class="text-xs text-gray-400 uppercase font-bold mb-1">Ganhos</p>
                 <h2 id="total-entradas" class="text-2xl font-bold text-green-600">R$ 0,00</h2>
             </div>
-            <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-red-500">
-                <p class="text-sm text-gray-500 uppercase font-bold">Total Saídas</p>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border-b-4 border-red-500 transition-transform hover:scale-105">
+                <p class="text-xs text-gray-400 uppercase font-bold mb-1">Despesas</p>
                 <h2 id="total-saidas" class="text-2xl font-bold text-red-600">R$ 0,00</h2>
             </div>
-            <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-blue-500">
-                <p class="text-sm text-gray-500 uppercase font-bold">Saldo Disponível</p>
-                <h2 id="saldo-total" class="text-2xl font-bold text-blue-700">R$ 0,00</h2>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border-b-4 border-blue-600 transition-transform hover:scale-105">
+                <p class="text-xs text-gray-400 uppercase font-bold mb-1">Saldo Atual</p>
+                <h2 id="saldo-total" class="text-2xl font-bold text-blue-800">R$ 0,00</h2>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-            <div class="bg-white p-8 rounded-2xl shadow-sm">
-                <h3 class="text-xl font-bold mb-6 text-gray-800">Nova Transação</h3>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="bg-white p-6 md:p-8 rounded-2xl shadow-md border border-gray-100">
+                <h3 class="text-xl font-bold mb-6 text-gray-800 flex items-center">
+                    <span class="w-2 h-6 bg-blue-600 rounded mr-2"></span> Nova Entrada/Saída
+                </h3>
                 <form id="form-transacao" class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Descrição</label>
-                        <input type="text" id="desc" placeholder="Ex: Venda de Produto ou Aluguel" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" required>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Descrição do Gasto</label>
+                        <input type="text" id="desc" placeholder="Ex: Pagamento Cliente X" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all" required>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700">Valor (R$)</label>
-                            <input type="number" step="0.01" id="valor" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" required>
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Valor</label>
+                            <input type="number" step="0.01" id="valor" placeholder="0,00" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" required>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700">Tipo</label>
-                            <select id="tipo" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
-                                <option value="entrada">Entrada (+)</option>
-                                <option value="saida">Saída (-)</option>
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Categoria</label>
+                            <select id="tipo" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer">
+                                <option value="entrada" class="text-green-600">Entrada (+)</option>
+                                <option value="saida" class="text-red-600">Saída (-)</option>
                             </select>
                         </div>
                     </div>
-                    <button type="submit" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700 transition">Adicionar Registro</button>
+                    <button type="submit" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all active:scale-95">Salvar no Banco Local</button>
                 </form>
             </div>
 
-            <div class="bg-white p-8 rounded-2xl shadow-sm flex flex-col items-center justify-center">
-                <h3 class="text-xl font-bold mb-6 text-gray-800 text-left w-full">Visão Geral</h3>
-                <div class="w-full max-w-[300px]">
+            <div class="bg-white p-8 rounded-2xl shadow-md border border-gray-100 flex flex-col items-center justify-center min-h-[350px]">
+                <h3 class="text-xl font-bold mb-4 text-gray-800 w-full">Distribuição de Capital</h3>
+                <div class="w-full max-w-[280px]">
                     <canvas id="graficoGastos"></canvas>
                 </div>
             </div>
         </div>
 
-        <div class="mt-10 bg-white rounded-2xl shadow-sm overflow-hidden">
-            <div class="p-6 border-b border-gray-100 font-bold text-lg text-gray-800">Histórico de Movimentações</div>
+        <div class="mt-8 bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="font-bold text-lg text-gray-800 text-sm md:text-base">Histórico de Transações</h3>
+                <button onclick="limparTudo()" class="text-xs font-bold text-red-500 hover:underline">Limpar Banco</button>
+            </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left">
-                    <thead class="bg-gray-50 text-gray-500 text-sm uppercase">
+                    <thead class="bg-gray-50 text-gray-400 text-[10px] uppercase tracking-wider">
                         <tr>
-                            <th class="p-4 font-semibold">Descrição</th>
-                            <th class="p-4 font-semibold text-center">Tipo</th>
-                            <th class="p-4 font-semibold text-right">Valor</th>
+                            <th class="p-4 font-bold">Item</th>
+                            <th class="p-4 font-bold text-center">Tipo</th>
+                            <th class="p-4 font-bold text-right">Valor</th>
+                            <th class="p-4 font-bold text-center">Ação</th>
                         </tr>
                     </thead>
-                    <tbody id="lista-transacoes">
+                    <tbody id="lista-transacoes" class="divide-y divide-gray-50">
                         </tbody>
                 </table>
             </div>
@@ -91,25 +99,22 @@
     </div>
 
     <script>
-        let transacoes = [];
+        // Inicialização do Banco Local (Cache)
+        let transacoes = JSON.parse(localStorage.getItem('banco_capital_pro')) || [];
         let meuGrafico;
 
         const form = document.getElementById('form-transacao');
         const lista = document.getElementById('lista-transacoes');
         
-        // Formatar data
         document.getElementById('data-atual').innerText = new Date().toLocaleDateString('pt-BR');
 
-        // Função para atualizar cálculos
-        function atualizarResumo() {
-            const entradas = transacoes
-                .filter(t => t.tipo === 'entrada')
-                .reduce((acc, t) => acc + t.valor, 0);
-            
-            const saidas = transacoes
-                .filter(t => t.tipo === 'saida')
-                .reduce((acc, t) => acc + t.valor, 0);
+        function salvarNoCache() {
+            localStorage.setItem('banco_capital_pro', JSON.stringify(transacoes));
+        }
 
+        function atualizarResumo() {
+            const entradas = transacoes.filter(t => t.tipo === 'entrada').reduce((acc, t) => acc + t.valor, 0);
+            const saidas = transacoes.filter(t => t.tipo === 'saida').reduce((acc, t) => acc + t.valor, 0);
             const saldo = entradas - saidas;
 
             document.getElementById('total-entradas').innerText = `R$ ${entradas.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
@@ -119,68 +124,92 @@
             atualizarGrafico(entradas, saidas);
         }
 
-        // Função para renderizar lista
         function renderizarLista() {
             lista.innerHTML = "";
-            transacoes.forEach((t) => {
+            transacoes.forEach((t, index) => {
                 const corTexto = t.tipo === 'entrada' ? 'text-green-600' : 'text-red-600';
                 const row = `
-                    <tr class="border-b border-gray-50 hover:bg-gray-50">
-                        <td class="p-4 font-medium">${t.desc}</td>
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="p-4 text-sm font-semibold text-gray-700">${t.desc}</td>
                         <td class="p-4 text-center">
-                            <span class="px-3 py-1 rounded-full text-xs font-bold ${t.tipo === 'entrada' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
+                            <span class="px-2 py-1 rounded-md text-[10px] font-black ${t.tipo === 'entrada' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
                                 ${t.tipo.toUpperCase()}
                             </span>
                         </td>
-                        <td class="p-4 text-right font-bold ${corTexto}">R$ ${t.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+                        <td class="p-4 text-right font-bold ${corTexto} text-sm">R$ ${t.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+                        <td class="p-4 text-center">
+                            <button onclick="removerItem(${index})" class="text-red-300 hover:text-red-600 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="id="m19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                            </button>
+                        </td>
                     </tr>
                 `;
                 lista.innerHTML += row;
             });
         }
 
-        // Função do Gráfico
         function atualizarGrafico(entradas, saidas) {
             const ctx = document.getElementById('graficoGastos').getContext('2d');
-            
             if (meuGrafico) meuGrafico.destroy();
+            
+            // Se não houver dados, mostra gráfico neutro
+            const dataVal = (entradas === 0 && saidas === 0) ? [1, 0] : [entradas, saidas];
+            const colors = (entradas === 0 && saidas === 0) ? ['#e5e7eb', '#e5e7eb'] : ['#10b981', '#ef4444'];
 
             meuGrafico = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
                     labels: ['Entradas', 'Saídas'],
                     datasets: [{
-                        data: [entradas, saidas],
-                        backgroundColor: ['#10b981', '#ef4444'],
-                        borderWidth: 0,
-                        hoverOffset: 4
+                        data: dataVal,
+                        backgroundColor: colors,
+                        borderWidth: 5,
+                        borderColor: '#ffffff',
+                        hoverOffset: 10
                     }]
                 },
                 options: {
-                    cutout: '70%',
-                    plugins: {
-                        legend: { position: 'bottom' }
-                    }
+                    cutout: '75%',
+                    plugins: { legend: { display: false } }
                 }
             });
         }
 
-        // Evento de Envio
         form.addEventListener('submit', (e) => {
             e.preventDefault();
             const desc = document.getElementById('desc').value;
             const valor = parseFloat(document.getElementById('valor').value);
             const tipo = document.getElementById('tipo').value;
 
-            transacoes.push({ desc, valor, tipo });
+            transacoes.unshift({ desc, valor, tipo }); // Adiciona no topo
             
-            form.reset();
+            salvarNoCache();
             renderizarLista();
             atualizarResumo();
+            form.reset();
         });
 
-        // Inicializar gráfico vazio
-        atualizarGrafico(0, 0);
+        function removerItem(index) {
+            transacoes.splice(index, 1);
+            salvarNoCache();
+            renderizarLista();
+            atualizarResumo();
+        }
+
+        function limparTudo() {
+            if(confirm("Deseja apagar todos os dados do banco?")) {
+                transacoes = [];
+                salvarNoCache();
+                renderizarLista();
+                atualizarResumo();
+            }
+        }
+
+        // Carregamento Inicial
+        renderizarLista();
+        atualizarResumo();
     </script>
 </body>
 </html>
