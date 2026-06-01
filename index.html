@@ -165,123 +165,37 @@
      RESPONSIVO — MOBILE
   ══════════════════════════════ */
   @media(max-width:768px){
-
-    /* ── Sidebar vira bottom nav ── */
-    .sidebar{
-      width:100% !important;
-      height:58px !important;
-      flex-direction:row !important;
-      top:auto !important;
-      bottom:0 !important;
-      left:0 !important;
-      right:0 !important;
-      padding:0 16px !important;
-      justify-content:space-around !important;
-      align-items:center !important;
-      gap:0 !important;
-      box-shadow:0 -2px 20px rgba(0,0,0,0.18) !important;
-      z-index:200 !important;
-    }
-    .s-logo{ display:none !important; }
-    .s-divider{ display:none !important; }
-    .s-btn{ margin:0 !important; width:42px !important; height:42px !important; font-size:18px !important; }
-
-    /* ── Main content ocupa tela toda ── */
-    .main-wrap{
-      margin-left:0 !important;
-      padding:16px 14px 72px !important;
-      min-height:100vh;
-    }
-
-    /* ── Top bar empilha verticalmente ── */
-    .main-wrap > div:first-child{
-      flex-direction:column !important;
-      align-items:flex-start !important;
-      gap:10px !important;
-      margin-bottom:16px !important;
-    }
-    .main-wrap > div:first-child > div:last-child{
-      width:100% !important;
-      flex-wrap:wrap !important;
-      gap:8px !important;
-    }
-    #limit-box{ min-width:unset !important; width:100% !important; }
-
-    /* ── Título da página ── */
-    h1#page-title{ font-size:20px !important; }
-
-    /* ── Cards: 2 colunas ── */
-    #dash-cards-grid{
-      grid-template-columns:1fr 1fr !important;
-      gap:10px !important;
-      margin-bottom:16px !important;
-    }
-    .card-stat{ padding:14px 12px !important; }
-    .card-stat .cs-val{ font-size:17px !important; }
-    .card-stat .cs-label{ font-size:10px !important; }
-    .card-stat .cs-icon{ width:36px !important; height:36px !important; font-size:16px !important; margin-bottom:8px !important; }
-
-    /* ── Gráficos: coluna única ── */
-    #dash-charts-grid{
-      grid-template-columns:1fr !important;
-      gap:12px !important;
-    }
-
-    /* ── Formulário nova transação ── */
-    #page-add .panel{ padding:20px 14px !important; max-width:100% !important; }
-    #form-grid-vt{ grid-template-columns:1fr !important; }
-
-    /* ── Tabela histórico: oculta categoria ── */
-    #page-hist thead th:nth-child(2),
-    #lista-transacoes td:nth-child(2){ display:none !important; }
-    #lista-transacoes td{ padding:10px 10px !important; font-size:12px !important; }
-    #page-hist thead th{ padding:10px 10px !important; }
-
-    /* ── IA Widget: encosta na barra inferior ── */
-    #ia-widget{
-      bottom:66px !important;
-      right:12px !important;
-      left:12px !important;
-      display:flex !important;
-      flex-direction:column !important;
-      align-items:flex-end !important;
-    }
-
-    /* Painel da IA ocupa a largura da tela */
-    #ia-panel{
-      position:fixed !important;
-      bottom:66px !important;
-      left:8px !important;
-      right:8px !important;
-      width:auto !important;
-      max-height:70vh !important;
-      border-radius:18px !important;
-    }
-    #ia-messages{ max-height:45vh !important; }
-
-    /* Bolha da IA: posição fixa independente */
-    #ia-bubble{
-      position:fixed !important;
-      bottom:68px !important;
-      right:14px !important;
-      width:52px !important;
-      height:52px !important;
-    }
-
-    /* ── Config modal ── */
-    #cfg-box{ padding:22px 16px !important; }
-
-    /* ── Toast ── */
-    #ia-toast{ width:calc(100% - 24px) !important; max-width:none !important; font-size:13px; }
+    .sidebar{width:100%!important;height:58px!important;flex-direction:row!important;top:auto!important;bottom:0!important;left:0!important;right:0!important;padding:0 16px!important;justify-content:space-around!important;align-items:center!important;gap:0!important;box-shadow:0 -2px 20px rgba(0,0,0,0.18)!important;z-index:200!important;}
+    .s-logo{display:none!important;}
+    .s-divider{display:none!important;}
+    .s-btn{margin:0!important;width:42px!important;height:42px!important;font-size:18px!important;}
+    .main-wrap{margin-left:0!important;padding:16px 14px 72px!important;}
+    .main-wrap > div:first-child{flex-direction:column!important;align-items:flex-start!important;gap:10px!important;margin-bottom:16px!important;}
+    .main-wrap > div:first-child > div:last-child{width:100%!important;flex-wrap:wrap!important;gap:8px!important;}
+    #limit-box{min-width:unset!important;width:100%!important;}
+    h1#page-title{font-size:20px!important;}
+    #dash-cards-grid{grid-template-columns:1fr 1fr!important;gap:10px!important;margin-bottom:16px!important;}
+    .card-stat{padding:14px 12px!important;}
+    .card-stat .cs-val{font-size:17px!important;}
+    .card-stat .cs-label{font-size:10px!important;}
+    .card-stat .cs-icon{width:36px!important;height:36px!important;font-size:16px!important;margin-bottom:8px!important;}
+    #dash-charts-grid{grid-template-columns:1fr!important;gap:12px!important;}
+    #page-add .panel{padding:20px 14px!important;max-width:100%!important;}
+    #form-grid-vt{grid-template-columns:1fr!important;}
+    #page-hist thead th:nth-child(2),#lista-transacoes td:nth-child(2){display:none!important;}
+    #lista-transacoes td{padding:10px 10px!important;font-size:12px!important;}
+    #page-hist thead th{padding:10px 10px!important;}
+    #ia-widget{position:static!important;display:block!important;}
+    #ia-bubble{position:fixed!important;bottom:68px!important;right:14px!important;width:52px!important;height:52px!important;z-index:9999!important;}
+    #ia-panel{position:fixed!important;bottom:66px!important;left:8px!important;right:8px!important;width:auto!important;max-height:72vh!important;border-radius:18px!important;z-index:9998!important;}
+    #ia-messages{max-height:48vh!important;}
+    #cfg-box{padding:22px 16px!important;}
+    #ia-toast{width:calc(100% - 24px)!important;max-width:none!important;}
   }
-
-  /* ── Telas muito pequenas (≤ 400px) ── */
   @media(max-width:400px){
-    #dash-cards-grid{
-      grid-template-columns:1fr 1fr !important;
-    }
-    .card-stat .cs-val{ font-size:15px !important; }
-    .main-wrap{ padding:12px 10px 72px !important; }
+    #dash-cards-grid{grid-template-columns:1fr 1fr!important;}
+    .card-stat .cs-val{font-size:15px!important;}
+    .main-wrap{padding:12px 10px 72px!important;}
   }
 </style>
 </head>
@@ -975,7 +889,7 @@ async function chamarIA(prompt) {
   if (provider === 'groq') {
     const r = await fetch('https://api.groq.com/openai/v1/chat/completions',{
       method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},
-      body: JSON.stringify({ model:'llama3-8b-8192', messages:[
+      body: JSON.stringify({ model:'llama-3.3-70b-versatile', messages:[
         { role:'system', content:'Você é um assistente financeiro pessoal. Responda sempre em português.' },
         { role:'user', content: prompt }
       ], max_tokens:300 })
