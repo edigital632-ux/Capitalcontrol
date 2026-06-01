@@ -161,81 +161,127 @@
   /* Gráfico label center */
   .chart-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;}
 
-  /* ── RESPONSIVO MOBILE ── */
+  /* ══════════════════════════════
+     RESPONSIVO — MOBILE
+  ══════════════════════════════ */
   @media(max-width:768px){
-    /* Sidebar vira barra inferior */
+
+    /* ── Sidebar vira bottom nav ── */
     .sidebar{
-      width:100%;height:60px;flex-direction:row;top:auto;bottom:0;left:0;
-      padding:0 8px;justify-content:space-around;gap:0;
-      box-shadow:0 -2px 16px rgba(0,0,0,0.15);
+      width:100% !important;
+      height:58px !important;
+      flex-direction:row !important;
+      top:auto !important;
+      bottom:0 !important;
+      left:0 !important;
+      right:0 !important;
+      padding:0 16px !important;
+      justify-content:space-around !important;
+      align-items:center !important;
+      gap:0 !important;
+      box-shadow:0 -2px 20px rgba(0,0,0,0.18) !important;
+      z-index:200 !important;
     }
-    .s-logo{display:none;}
-    .s-divider{display:none;}
-    .s-btn{margin-top:0 !important;width:44px;height:44px;}
+    .s-logo{ display:none !important; }
+    .s-divider{ display:none !important; }
+    .s-btn{ margin:0 !important; width:42px !important; height:42px !important; font-size:18px !important; }
 
-    /* Conteúdo principal não fica sob a sidebar lateral */
+    /* ── Main content ocupa tela toda ── */
     .main-wrap{
-      margin-left:0;
-      padding:16px 12px 80px;
+      margin-left:0 !important;
+      padding:16px 14px 72px !important;
+      min-height:100vh;
     }
 
-    /* Auth card ocupa melhor a tela */
-    .auth-card{padding:28px 20px;margin:16px;}
-
-    /* Cards de stats em 2 colunas */
-    #page-dashboard > div:first-child{
-      grid-template-columns:1fr 1fr !important;
-      gap:10px !important;
-    }
-    .card-stat{padding:16px 14px;}
-    .card-stat .cs-val{font-size:18px;}
-
-    /* Gráficos empilham em coluna */
-    #page-dashboard > div:nth-child(2){
-      grid-template-columns:1fr !important;
-      gap:14px !important;
-    }
-
-    /* Top bar empilha */
+    /* ── Top bar empilha verticalmente ── */
     .main-wrap > div:first-child{
-      flex-direction:column;
+      flex-direction:column !important;
       align-items:flex-start !important;
       gap:10px !important;
+      margin-bottom:16px !important;
     }
     .main-wrap > div:first-child > div:last-child{
-      width:100%;
-      flex-wrap:wrap;
+      width:100% !important;
+      flex-wrap:wrap !important;
+      gap:8px !important;
     }
-    #limit-box{min-width:unset;width:100%;}
+    #limit-box{ min-width:unset !important; width:100% !important; }
 
-    /* Formulário nova transação */
-    #page-add .panel{padding:20px 16px;}
-    #page-add form div[style*="grid-template-columns:1fr 1fr"]{
+    /* ── Título da página ── */
+    h1#page-title{ font-size:20px !important; }
+
+    /* ── Cards: 2 colunas ── */
+    #dash-cards-grid{
+      grid-template-columns:1fr 1fr !important;
+      gap:10px !important;
+      margin-bottom:16px !important;
+    }
+    .card-stat{ padding:14px 12px !important; }
+    .card-stat .cs-val{ font-size:17px !important; }
+    .card-stat .cs-label{ font-size:10px !important; }
+    .card-stat .cs-icon{ width:36px !important; height:36px !important; font-size:16px !important; margin-bottom:8px !important; }
+
+    /* ── Gráficos: coluna única ── */
+    #dash-charts-grid{
       grid-template-columns:1fr !important;
+      gap:12px !important;
     }
 
-    /* Tabela histórico: oculta coluna categoria em telas pequenas */
-    #lista-transacoes td:nth-child(2),
-    #page-hist thead th:nth-child(2){display:none;}
+    /* ── Formulário nova transação ── */
+    #page-add .panel{ padding:20px 14px !important; max-width:100% !important; }
+    #form-grid-vt{ grid-template-columns:1fr !important; }
 
-    /* IA widget menor em mobile */
-    #ia-widget{bottom:68px;right:12px;}
-    #ia-panel{width:calc(100vw - 24px);right:-12px;}
+    /* ── Tabela histórico: oculta categoria ── */
+    #page-hist thead th:nth-child(2),
+    #lista-transacoes td:nth-child(2){ display:none !important; }
+    #lista-transacoes td{ padding:10px 10px !important; font-size:12px !important; }
+    #page-hist thead th{ padding:10px 10px !important; }
 
-    /* Config modal ocupa tela toda */
-    #cfg-box{padding:24px 18px;}
+    /* ── IA Widget: encosta na barra inferior ── */
+    #ia-widget{
+      bottom:66px !important;
+      right:12px !important;
+      left:12px !important;
+      display:flex !important;
+      flex-direction:column !important;
+      align-items:flex-end !important;
+    }
 
-    /* Toast mais compacto */
-    #ia-toast{width:calc(100% - 24px);max-width:none;}
+    /* Painel da IA ocupa a largura da tela */
+    #ia-panel{
+      position:fixed !important;
+      bottom:66px !important;
+      left:8px !important;
+      right:8px !important;
+      width:auto !important;
+      max-height:70vh !important;
+      border-radius:18px !important;
+    }
+    #ia-messages{ max-height:45vh !important; }
+
+    /* Bolha da IA: posição fixa independente */
+    #ia-bubble{
+      position:fixed !important;
+      bottom:68px !important;
+      right:14px !important;
+      width:52px !important;
+      height:52px !important;
+    }
+
+    /* ── Config modal ── */
+    #cfg-box{ padding:22px 16px !important; }
+
+    /* ── Toast ── */
+    #ia-toast{ width:calc(100% - 24px) !important; max-width:none !important; font-size:13px; }
   }
 
+  /* ── Telas muito pequenas (≤ 400px) ── */
   @media(max-width:400px){
-    /* Cards em coluna única em telas muito pequenas */
-    #page-dashboard > div:first-child{
-      grid-template-columns:1fr !important;
+    #dash-cards-grid{
+      grid-template-columns:1fr 1fr !important;
     }
-    .card-stat .cs-val{font-size:20px;}
-    h1[id="page-title"]{font-size:18px !important;}
+    .card-stat .cs-val{ font-size:15px !important; }
+    .main-wrap{ padding:12px 10px 72px !important; }
   }
 </style>
 </head>
@@ -373,7 +419,7 @@
     <div id="page-dashboard" class="page active">
 
       <!-- Cards -->
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px;">
+      <div id="dash-cards-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px;">
         <div class="card-stat" style="background:linear-gradient(135deg,#ecfdf5,#d1fae5);">
           <div class="cs-icon" style="background:rgba(16,185,129,0.15);">💰</div>
           <div class="cs-label" style="color:#065f46;">Ganhos Totais</div>
@@ -401,7 +447,7 @@
       </div>
 
       <!-- Gráficos -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;" class="md:grid-cols-2">
+      <div id="dash-charts-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;" class="md:grid-cols-2">
         <!-- Donut -->
         <div class="panel" style="padding:24px;">
           <h3 style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px;">Distribuição de Capital</h3>
@@ -455,7 +501,7 @@
             <label class="flabel">Descrição</label>
             <input type="text" id="desc" placeholder="Ex: Salário, Aluguel, Freelance..." class="finput" required>
           </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px;">
+          <div id="form-grid-vt" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px;">
             <div>
               <label class="flabel">Valor (R$)</label>
               <input type="number" step="0.01" id="valor" placeholder="0,00" class="finput" required>
