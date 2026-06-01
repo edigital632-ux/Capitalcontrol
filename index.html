@@ -1,215 +1,972 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Capital Pro</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        .hide-scroll::-webkit-scrollbar { display: none; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CapitalControl Pro</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{font-family:'Inter',sans-serif;box-sizing:border-box;}
+  ::-webkit-scrollbar{width:5px;height:5px;}
+  ::-webkit-scrollbar-track{background:#f1f5f9;}
+  ::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:99px;}
+
+  /* ── AUTH ── */
+  #auth-screen{position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 50%,#0f172a 100%);}
+  .auth-card{background:rgba(255,255,255,0.05);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.1);
+    border-radius:24px;padding:40px 36px;width:100%;max-width:420px;box-shadow:0 25px 60px rgba(0,0,0,0.5);}
+  .auth-logo{font-size:28px;font-weight:800;background:linear-gradient(90deg,#3b82f6,#8b5cf6);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px;}
+  .auth-sub{color:rgba(255,255,255,0.4);font-size:13px;margin-bottom:32px;}
+  .auth-label{display:block;font-size:11px;font-weight:700;color:rgba(255,255,255,0.5);
+    text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;}
+  .auth-input{width:100%;padding:13px 16px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);
+    border-radius:12px;color:white;font-size:14px;outline:none;transition:border .2s;}
+  .auth-input::placeholder{color:rgba(255,255,255,0.25);}
+  .auth-input:focus{border-color:rgba(99,102,241,0.7);background:rgba(255,255,255,0.1);}
+  .auth-btn{width:100%;padding:14px;background:linear-gradient(135deg,#3b82f6,#6d28d9);
+    border:none;border-radius:12px;color:white;font-weight:700;font-size:15px;cursor:pointer;
+    box-shadow:0 4px 20px rgba(99,102,241,0.4);transition:all .2s;margin-top:8px;}
+  .auth-btn:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(99,102,241,0.5);}
+  .auth-btn:active{transform:scale(.98);}
+  .auth-btn:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+  .auth-switch{text-align:center;margin-top:20px;color:rgba(255,255,255,0.4);font-size:13px;}
+  .auth-switch span{color:#818cf8;cursor:pointer;font-weight:600;}
+  .auth-switch span:hover{color:#a5b4fc;}
+  .auth-err{color:#f87171;font-size:12px;margin-top:6px;display:none;}
+  .auth-err.show{display:block;}
+  .spin{width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:white;
+    border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  /* ── MAIN APP ── */
+  #app-screen{display:none;}
+  body{background:#f0f4ff;}
+
+  /* Sidebar */
+  .sidebar{width:72px;background:linear-gradient(180deg,#0f172a,#1e3a5f);
+    position:fixed;top:0;left:0;height:100vh;display:flex;flex-direction:column;
+    align-items:center;padding:20px 0;gap:6px;z-index:100;box-shadow:4px 0 24px rgba(0,0,0,0.15);}
+  .s-logo{font-size:20px;font-weight:900;background:linear-gradient(90deg,#60a5fa,#a78bfa);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:16px;}
+  .s-btn{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+    cursor:pointer;transition:all .2s;color:rgba(255,255,255,0.4);font-size:20px;border:none;background:transparent;}
+  .s-btn:hover,.s-btn.active{background:rgba(255,255,255,0.12);color:white;}
+  .s-btn.active{box-shadow:0 0 0 2px rgba(99,102,241,0.6);}
+  .s-divider{width:36px;height:1px;background:rgba(255,255,255,0.08);margin:6px 0;}
+
+  /* Main content */
+  .main-wrap{margin-left:72px;min-height:100vh;padding:28px 28px 80px;}
+
+  /* Cards */
+  .card-stat{border-radius:20px;padding:22px 24px;position:relative;overflow:hidden;
+    transition:transform .2s,box-shadow .2s;cursor:default;}
+  .card-stat:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,0.12);}
+  .card-stat .cs-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;
+    justify-content:center;font-size:20px;margin-bottom:12px;}
+  .card-stat .cs-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;}
+  .card-stat .cs-val{font-size:26px;font-weight:800;line-height:1;}
+  .card-stat .cs-bar{position:absolute;bottom:0;left:0;right:0;height:4px;border-radius:0 0 20px 20px;}
+
+  /* Panels */
+  .panel{background:white;border-radius:20px;box-shadow:0 2px 20px rgba(0,0,0,0.06);border:1px solid #f1f5f9;}
+
+  /* Form inputs */
+  .finput{width:100%;padding:12px 16px;background:#f8fafc;border:1.5px solid #e2e8f0;
+    border-radius:12px;font-size:14px;outline:none;color:#1e293b;transition:all .2s;}
+  .finput:focus{border-color:#6366f1;background:white;box-shadow:0 0 0 3px rgba(99,102,241,0.1);}
+  .flabel{display:block;font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;
+    letter-spacing:.06em;margin-bottom:5px;}
+
+  /* Submit btn */
+  .fbtn{width:100%;padding:14px;background:linear-gradient(135deg,#3b82f6,#6d28d9);
+    border:none;border-radius:12px;color:white;font-weight:700;font-size:15px;cursor:pointer;
+    box-shadow:0 4px 20px rgba(99,102,241,0.3);transition:all .2s;}
+  .fbtn:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(99,102,241,0.4);}
+  .fbtn:active{transform:scale(.98);}
+  .fbtn:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+
+  /* Table */
+  .tbl-row{border-bottom:1px solid #f8fafc;transition:background .15s;}
+  .tbl-row:hover{background:#fafbff;}
+  .tbl-row:last-child{border-bottom:none;}
+
+  /* Badge */
+  .badge{display:inline-block;padding:3px 10px;border-radius:99px;font-size:10px;font-weight:800;letter-spacing:.05em;}
+
+  /* ── IA WIDGET ── */
+  #ia-widget{position:fixed;bottom:24px;right:24px;z-index:9999;}
+  #ia-bubble{width:58px;height:58px;border-radius:50%;
+    background:linear-gradient(135deg,#2563eb,#7c3aed);display:flex;align-items:center;
+    justify-content:center;cursor:pointer;box-shadow:0 4px 24px rgba(99,102,241,0.5);
+    transition:transform .2s;border:none;}
+  #ia-bubble:hover{transform:scale(1.1);}
+  #ia-bubble svg{width:26px;height:26px;fill:white;}
+  #ia-panel{position:absolute;bottom:70px;right:0;width:340px;background:white;border-radius:22px;
+    box-shadow:0 16px 60px rgba(0,0,0,0.2);display:none;flex-direction:column;overflow:hidden;
+    border:1px solid #e2e8f0;}
+  #ia-panel.open{display:flex;}
+  #ia-panel-header{background:linear-gradient(135deg,#2563eb,#7c3aed);padding:16px;
+    display:flex;align-items:center;gap:10px;}
+  #ia-panel-header .ia-title{color:white;font-weight:700;font-size:14px;flex:1;}
+  #ia-panel-header .ia-status{font-size:10px;color:rgba(255,255,255,0.7);}
+  #ia-messages{flex:1;max-height:310px;overflow-y:auto;padding:14px;
+    display:flex;flex-direction:column;gap:10px;background:#fafbff;}
+  .ia-bot{background:white;border:1px solid #e2e8f0;border-radius:14px 14px 14px 4px;
+    padding:10px 14px;font-size:13px;color:#334155;max-width:88%;align-self:flex-start;
+    line-height:1.55;box-shadow:0 2px 8px rgba(0,0,0,0.05);}
+  .ia-user{background:linear-gradient(135deg,#3b82f6,#6d28d9);border-radius:14px 14px 4px 14px;
+    padding:10px 14px;font-size:13px;color:white;max-width:88%;align-self:flex-end;}
+  .ia-alert{background:#fff1f2;border:1px solid #fecdd3;border-radius:14px;
+    padding:10px 14px;font-size:13px;color:#be123c;align-self:stretch;line-height:1.5;}
+  #ia-input-wrap{padding:10px;border-top:1px solid #f1f5f9;display:flex;gap:8px;background:white;}
+  #ia-input-wrap input{flex:1;padding:9px 13px;border:1.5px solid #e2e8f0;border-radius:10px;
+    font-size:13px;outline:none;color:#334155;}
+  #ia-input-wrap input:focus{border-color:#6366f1;}
+  #ia-input-wrap button{background:linear-gradient(135deg,#3b82f6,#6d28d9);color:white;
+    border:none;border-radius:10px;padding:9px 14px;cursor:pointer;font-size:13px;font-weight:700;}
+  .ia-dots span{width:6px;height:6px;background:#94a3b8;border-radius:50%;display:inline-block;
+    animation:iaDot 1.2s infinite;}
+  .ia-dots span:nth-child(2){animation-delay:.2s;}
+  .ia-dots span:nth-child(3){animation-delay:.4s;}
+  @keyframes iaDot{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-5px);opacity:1}}
+
+  /* ── TOAST ── */
+  #ia-toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-130px);
+    background:white;border-left:5px solid #ef4444;border-radius:14px;padding:14px 20px;
+    box-shadow:0 8px 40px rgba(0,0,0,0.16);z-index:99999;
+    transition:transform .4s cubic-bezier(.18,.89,.32,1.28);max-width:380px;width:90%;}
+  #ia-toast.show{transform:translateX(-50%) translateY(0);}
+  .toast-title{font-weight:700;color:#dc2626;font-size:13px;margin-bottom:3px;}
+  .toast-msg{font-size:12px;color:#475569;}
+
+  /* ── CONFIG MODAL ── */
+  #cfg-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:10000;
+    display:none;align-items:center;justify-content:center;padding:16px;}
+  #cfg-overlay.open{display:flex;}
+  #cfg-box{background:white;border-radius:24px;padding:32px;width:100%;max-width:430px;
+    box-shadow:0 24px 60px rgba(0,0,0,0.2);}
+
+  /* ── LIMIT BAR ── */
+  .lbar-bg{background:#f1f5f9;border-radius:99px;height:8px;overflow:hidden;}
+  .lbar-fill{height:100%;border-radius:99px;transition:width .6s;}
+
+  /* Page sections */
+  .page{display:none;}
+  .page.active{display:block;}
+
+  /* Gráfico label center */
+  .chart-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;}
+</style>
 </head>
-<body class="bg-gray-50 text-gray-900 hide-scroll">
+<body>
 
-    <div class="max-w-6xl mx-auto p-4 md:p-8">
-        <header class="flex justify-between items-center mb-8">
-            <div>
-                <h1 class="text-3xl font-bold text-blue-800">CapitalControl</h1>
-                <p class="text-gray-500 text-sm">Dados salvos automaticamente no dispositivo.</p>
-            </div>
-            <div class="bg-blue-100 p-3 rounded-lg text-center">
-                <span id="data-atual" class="font-semibold text-blue-700 block text-xs"></span>
-                <span class="text-[10px] text-blue-500 font-bold uppercase">Status: Online</span>
-            </div>
-        </header>
+<!-- ══════════════════════════════════════
+     AUTH SCREEN
+══════════════════════════════════════ -->
+<div id="auth-screen">
+  <div class="auth-card">
+    <div class="auth-logo">CapitalControl</div>
+    <div class="auth-sub">Gestão financeira inteligente com IA</div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border-b-4 border-green-500 transition-transform hover:scale-105">
-                <p class="text-xs text-gray-400 uppercase font-bold mb-1">Ganhos</p>
-                <h2 id="total-entradas" class="text-2xl font-bold text-green-600">R$ 0,00</h2>
-            </div>
-            <div class="bg-white p-6 rounded-2xl shadow-sm border-b-4 border-red-500 transition-transform hover:scale-105">
-                <p class="text-xs text-gray-400 uppercase font-bold mb-1">Despesas</p>
-                <h2 id="total-saidas" class="text-2xl font-bold text-red-600">R$ 0,00</h2>
-            </div>
-            <div class="bg-white p-6 rounded-2xl shadow-sm border-b-4 border-blue-600 transition-transform hover:scale-105">
-                <p class="text-xs text-gray-400 uppercase font-bold mb-1">Saldo Atual</p>
-                <h2 id="saldo-total" class="text-2xl font-bold text-blue-800">R$ 0,00</h2>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div class="bg-white p-6 md:p-8 rounded-2xl shadow-md border border-gray-100">
-                <h3 class="text-xl font-bold mb-6 text-gray-800 flex items-center">
-                    <span class="w-2 h-6 bg-blue-600 rounded mr-2"></span> Nova Entrada/Saída
-                </h3>
-                <form id="form-transacao" class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Descrição do Gasto</label>
-                        <input type="text" id="desc" placeholder="Ex: Pagamento Cliente X" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all" required>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Valor</label>
-                            <input type="number" step="0.01" id="valor" placeholder="0,00" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" required>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Categoria</label>
-                            <select id="tipo" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer">
-                                <option value="entrada" class="text-green-600">Entrada (+)</option>
-                                <option value="saida" class="text-red-600">Saída (-)</option>
-                            </select>
-                        </div>
-                    </div>
-                    <button type="submit" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all active:scale-95">Salvar no Banco Local</button>
-                </form>
-            </div>
-
-            <div class="bg-white p-8 rounded-2xl shadow-md border border-gray-100 flex flex-col items-center justify-center min-h-[350px]">
-                <h3 class="text-xl font-bold mb-4 text-gray-800 w-full">Distribuição de Capital</h3>
-                <div class="w-full max-w-[280px]">
-                    <canvas id="graficoGastos"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <div class="mt-8 bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
-            <div class="p-6 border-b border-gray-100 flex justify-between items-center">
-                <h3 class="font-bold text-lg text-gray-800 text-sm md:text-base">Histórico de Transações</h3>
-                <button onclick="limparTudo()" class="text-xs font-bold text-red-500 hover:underline">Limpar Banco</button>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left">
-                    <thead class="bg-gray-50 text-gray-400 text-[10px] uppercase tracking-wider">
-                        <tr>
-                            <th class="p-4 font-bold">Item</th>
-                            <th class="p-4 font-bold text-center">Tipo</th>
-                            <th class="p-4 font-bold text-right">Valor</th>
-                            <th class="p-4 font-bold text-center">Ação</th>
-                        </tr>
-                    </thead>
-                    <tbody id="lista-transacoes" class="divide-y divide-gray-50">
-                        </tbody>
-                </table>
-            </div>
-        </div>
+    <!-- LOGIN -->
+    <div id="view-login">
+      <div style="margin-bottom:16px;">
+        <label class="auth-label">E-mail</label>
+        <input class="auth-input" type="email" id="l-email" placeholder="seu@email.com">
+      </div>
+      <div style="margin-bottom:4px;">
+        <label class="auth-label">Senha</label>
+        <input class="auth-input" type="password" id="l-pass" placeholder="••••••••">
+      </div>
+      <div id="l-err" class="auth-err"></div>
+      <button class="auth-btn" id="btn-login" onclick="fazerLogin()">Entrar</button>
+      <div class="auth-switch">Não tem conta? <span onclick="trocarAuth('register')">Criar conta grátis</span></div>
     </div>
 
-    <script>
-        // Inicialização do Banco Local (Cache)
-        let transacoes = JSON.parse(localStorage.getItem('banco_capital_pro')) || [];
-        let meuGrafico;
+    <!-- CADASTRO -->
+    <div id="view-register" style="display:none;">
+      <div style="margin-bottom:16px;">
+        <label class="auth-label">Seu Nome</label>
+        <input class="auth-input" type="text" id="r-name" placeholder="Como podemos te chamar?">
+      </div>
+      <div style="margin-bottom:16px;">
+        <label class="auth-label">E-mail</label>
+        <input class="auth-input" type="email" id="r-email" placeholder="seu@email.com">
+      </div>
+      <div style="margin-bottom:4px;">
+        <label class="auth-label">Senha (mín. 6 caracteres)</label>
+        <input class="auth-input" type="password" id="r-pass" placeholder="Crie uma senha forte">
+      </div>
+      <div id="r-err" class="auth-err"></div>
+      <button class="auth-btn" id="btn-register" onclick="fazerCadastro()">Criar Conta</button>
+      <div class="auth-switch">Já tem conta? <span onclick="trocarAuth('login')">Entrar</span></div>
+    </div>
+  </div>
+</div>
 
-        const form = document.getElementById('form-transacao');
-        const lista = document.getElementById('lista-transacoes');
-        
-        document.getElementById('data-atual').innerText = new Date().toLocaleDateString('pt-BR');
+<!-- ══════════════════════════════════════
+     TOAST IA
+══════════════════════════════════════ -->
+<div id="ia-toast">
+  <div class="toast-title">⚠️ Alerta da IA Financeira</div>
+  <div class="toast-msg" id="ia-toast-msg"></div>
+</div>
 
-        function salvarNoCache() {
-            localStorage.setItem('banco_capital_pro', JSON.stringify(transacoes));
-        }
+<!-- ══════════════════════════════════════
+     CONFIG IA MODAL
+══════════════════════════════════════ -->
+<div id="cfg-overlay">
+  <div id="cfg-box">
+    <h2 style="font-size:20px;font-weight:800;color:#0f172a;margin-bottom:4px;">⚙️ Configurar IA Financeira</h2>
+    <p style="font-size:12px;color:#94a3b8;margin-bottom:24px;">Ative o monitoramento automático de gastos com IA gratuita.</p>
+    <div style="margin-bottom:16px;">
+      <label class="flabel">Provedor de IA</label>
+      <select id="cfg-provider" class="finput" onchange="atualizarLinkAPI()">
+        <option value="gemini">🟢 Google Gemini Flash (gratuito)</option>
+        <option value="groq">🟣 Groq — LLaMA 3 (gratuito)</option>
+      </select>
+    </div>
+    <div style="margin-bottom:6px;">
+      <label class="flabel">Chave de API</label>
+      <input type="password" id="cfg-apikey" placeholder="Cole sua chave aqui..." class="finput">
+    </div>
+    <p id="cfg-link" style="font-size:11px;color:#6366f1;cursor:pointer;margin-bottom:16px;" class="hover:underline"></p>
+    <div style="margin-bottom:22px;">
+      <label class="flabel">Limite de Gastos Mensais (R$)</label>
+      <input type="number" id="cfg-limit" placeholder="Ex: 3000,00" class="finput">
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="salvarConfig()" class="fbtn" style="flex:1;">✅ Salvar e Ativar</button>
+      <button onclick="fecharConfig()" style="padding:14px 20px;background:#f1f5f9;border:none;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;color:#64748b;">Fechar</button>
+    </div>
+  </div>
+</div>
 
-        function atualizarResumo() {
-            const entradas = transacoes.filter(t => t.tipo === 'entrada').reduce((acc, t) => acc + t.valor, 0);
-            const saidas = transacoes.filter(t => t.tipo === 'saida').reduce((acc, t) => acc + t.valor, 0);
-            const saldo = entradas - saidas;
+<!-- ══════════════════════════════════════
+     APP PRINCIPAL
+══════════════════════════════════════ -->
+<div id="app-screen">
 
-            document.getElementById('total-entradas').innerText = `R$ ${entradas.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-            document.getElementById('total-saidas').innerText = `R$ ${saidas.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-            document.getElementById('saldo-total').innerText = `R$ ${saldo.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="s-logo">CC</div>
+    <button class="s-btn active" id="sn-dash" onclick="navTo('dashboard')" title="Dashboard">📊</button>
+    <button class="s-btn" id="sn-add" onclick="navTo('add')" title="Nova Transação">➕</button>
+    <button class="s-btn" id="sn-hist" onclick="navTo('hist')" title="Histórico">📋</button>
+    <div class="s-divider"></div>
+    <button class="s-btn" onclick="abrirConfig()" title="Config IA" style="margin-top:auto;">🤖</button>
+    <button class="s-btn" id="btn-sair" title="Sair" style="color:#f87171;">🚪</button>
+  </nav>
 
-            atualizarGrafico(entradas, saidas);
-        }
+  <!-- MAIN -->
+  <div class="main-wrap">
 
-        function renderizarLista() {
-            lista.innerHTML = "";
-            transacoes.forEach((t, index) => {
-                const corTexto = t.tipo === 'entrada' ? 'text-green-600' : 'text-red-600';
-                const row = `
-                    <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="p-4 text-sm font-semibold text-gray-700">${t.desc}</td>
-                        <td class="p-4 text-center">
-                            <span class="px-2 py-1 rounded-md text-[10px] font-black ${t.tipo === 'entrada' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
-                                ${t.tipo.toUpperCase()}
-                            </span>
-                        </td>
-                        <td class="p-4 text-right font-bold ${corTexto} text-sm">R$ ${t.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
-                        <td class="p-4 text-center">
-                            <button onclick="removerItem(${index})" class="text-red-300 hover:text-red-600 transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="id="m19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
-                            </button>
-                        </td>
-                    </tr>
-                `;
-                lista.innerHTML += row;
-            });
-        }
+    <!-- TOP BAR -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;flex-wrap:wrap;gap:12px;">
+      <div>
+        <h1 style="font-size:24px;font-weight:800;color:#0f172a;" id="page-title">Dashboard</h1>
+        <p style="font-size:13px;color:#94a3b8;" id="user-greeting">Bem-vindo!</p>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <!-- Barra de limite -->
+        <div id="limit-box" style="display:none;background:white;border-radius:14px;padding:12px 16px;
+          border:1px solid #f1f5f9;box-shadow:0 2px 12px rgba(0,0,0,0.05);min-width:180px;">
+          <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;">Limite Mensal</p>
+          <div class="lbar-bg" style="margin-bottom:5px;"><div id="lbar-fill" class="lbar-fill bg-green-500" style="width:0%"></div></div>
+          <p id="lbar-label" style="font-size:11px;font-weight:700;color:#475569;"></p>
+        </div>
+        <!-- User pill -->
+        <div style="background:white;border-radius:14px;padding:10px 16px;display:flex;align-items:center;gap:10px;
+          border:1px solid #f1f5f9;box-shadow:0 2px 12px rgba(0,0,0,0.05);">
+          <div style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);
+            display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:14px;" id="user-av">?</div>
+          <div>
+            <p style="font-size:13px;font-weight:700;color:#0f172a;" id="user-name-top">—</p>
+            <p style="font-size:10px;color:#94a3b8;" id="sync-status">Conectando...</p>
+          </div>
+        </div>
+      </div>
+    </div>
 
-        function atualizarGrafico(entradas, saidas) {
-            const ctx = document.getElementById('graficoGastos').getContext('2d');
-            if (meuGrafico) meuGrafico.destroy();
-            
-            // Se não houver dados, mostra gráfico neutro
-            const dataVal = (entradas === 0 && saidas === 0) ? [1, 0] : [entradas, saidas];
-            const colors = (entradas === 0 && saidas === 0) ? ['#e5e7eb', '#e5e7eb'] : ['#10b981', '#ef4444'];
+    <!-- ── PAGE: DASHBOARD ── -->
+    <div id="page-dashboard" class="page active">
 
-            meuGrafico = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Entradas', 'Saídas'],
-                    datasets: [{
-                        data: dataVal,
-                        backgroundColor: colors,
-                        borderWidth: 5,
-                        borderColor: '#ffffff',
-                        hoverOffset: 10
-                    }]
-                },
-                options: {
-                    cutout: '75%',
-                    plugins: { legend: { display: false } }
-                }
-            });
-        }
+      <!-- Cards -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px;">
+        <div class="card-stat" style="background:linear-gradient(135deg,#ecfdf5,#d1fae5);">
+          <div class="cs-icon" style="background:rgba(16,185,129,0.15);">💰</div>
+          <div class="cs-label" style="color:#065f46;">Ganhos Totais</div>
+          <div class="cs-val" style="color:#065f46;" id="c-entradas">R$ 0,00</div>
+          <div class="cs-bar" style="background:#10b981;"></div>
+        </div>
+        <div class="card-stat" style="background:linear-gradient(135deg,#fff1f2,#ffe4e6);">
+          <div class="cs-icon" style="background:rgba(239,68,68,0.15);">💸</div>
+          <div class="cs-label" style="color:#991b1b;">Despesas Totais</div>
+          <div class="cs-val" style="color:#991b1b;" id="c-saidas">R$ 0,00</div>
+          <div class="cs-bar" style="background:#ef4444;"></div>
+        </div>
+        <div class="card-stat" style="background:linear-gradient(135deg,#eff6ff,#dbeafe);">
+          <div class="cs-icon" style="background:rgba(59,130,246,0.15);">📈</div>
+          <div class="cs-label" style="color:#1e40af;">Saldo Atual</div>
+          <div class="cs-val" style="color:#1e40af;" id="c-saldo">R$ 0,00</div>
+          <div class="cs-bar" style="background:#3b82f6;"></div>
+        </div>
+        <div class="card-stat" style="background:linear-gradient(135deg,#faf5ff,#ede9fe);">
+          <div class="cs-icon" style="background:rgba(139,92,246,0.15);">🔢</div>
+          <div class="cs-label" style="color:#5b21b6;">Transações</div>
+          <div class="cs-val" style="color:#5b21b6;" id="c-total">0</div>
+          <div class="cs-bar" style="background:#8b5cf6;"></div>
+        </div>
+      </div>
 
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const desc = document.getElementById('desc').value;
-            const valor = parseFloat(document.getElementById('valor').value);
-            const tipo = document.getElementById('tipo').value;
+      <!-- Gráficos -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;" class="md:grid-cols-2">
+        <!-- Donut -->
+        <div class="panel" style="padding:24px;">
+          <h3 style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px;">Distribuição de Capital</h3>
+          <p style="font-size:12px;color:#94a3b8;margin-bottom:20px;">Ganhos vs Despesas</p>
+          <div style="position:relative;max-width:220px;margin:0 auto;">
+            <canvas id="grafico-donut"></canvas>
+            <div class="chart-center" id="donut-center">
+              <div style="font-size:11px;color:#94a3b8;font-weight:600;">SALDO</div>
+              <div style="font-size:18px;font-weight:800;color:#0f172a;" id="donut-saldo-label">R$ 0</div>
+            </div>
+          </div>
+          <!-- Legenda -->
+          <div style="display:flex;justify-content:center;gap:20px;margin-top:16px;">
+            <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#475569;">
+              <div style="width:10px;height:10px;border-radius:50%;background:#10b981;"></div>Entradas
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#475569;">
+              <div style="width:10px;height:10px;border-radius:50%;background:#ef4444;"></div>Saídas
+            </div>
+          </div>
+        </div>
 
-            transacoes.unshift({ desc, valor, tipo }); // Adiciona no topo
-            
-            salvarNoCache();
-            renderizarLista();
-            atualizarResumo();
-            form.reset();
-        });
+        <!-- Barras últimas transações -->
+        <div class="panel" style="padding:24px;">
+          <h3 style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px;">Últimas 6 Movimentações</h3>
+          <p style="font-size:12px;color:#94a3b8;margin-bottom:20px;">Entradas e saídas recentes</p>
+          <canvas id="grafico-barras" style="max-height:200px;"></canvas>
+        </div>
+      </div>
 
-        function removerItem(index) {
-            transacoes.splice(index, 1);
-            salvarNoCache();
-            renderizarLista();
-            atualizarResumo();
-        }
+      <!-- Mini tabela últimas -->
+      <div class="panel">
+        <div style="padding:20px 24px;border-bottom:1px solid #f8fafc;display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <h3 style="font-size:15px;font-weight:700;color:#0f172a;">Últimas Transações</h3>
+            <p style="font-size:12px;color:#94a3b8;">5 mais recentes</p>
+          </div>
+          <button onclick="navTo('hist')" style="font-size:12px;font-weight:700;color:#6366f1;background:none;border:none;cursor:pointer;">Ver tudo →</button>
+        </div>
+        <div id="mini-lista" style="padding:8px 0;"></div>
+      </div>
+    </div>
 
-        function limparTudo() {
-            if(confirm("Deseja apagar todos os dados do banco?")) {
-                transacoes = [];
-                salvarNoCache();
-                renderizarLista();
-                atualizarResumo();
-            }
-        }
+    <!-- ── PAGE: NOVA TRANSAÇÃO ── -->
+    <div id="page-add" class="page">
+      <div class="panel" style="padding:32px;max-width:560px;">
+        <h3 style="font-size:18px;font-weight:800;color:#0f172a;margin-bottom:6px;">Nova Transação</h3>
+        <p style="font-size:13px;color:#94a3b8;margin-bottom:28px;">Registre uma entrada ou saída no Firebase</p>
+        <form id="form-transacao">
+          <div style="margin-bottom:18px;">
+            <label class="flabel">Descrição</label>
+            <input type="text" id="desc" placeholder="Ex: Salário, Aluguel, Freelance..." class="finput" required>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px;">
+            <div>
+              <label class="flabel">Valor (R$)</label>
+              <input type="number" step="0.01" id="valor" placeholder="0,00" class="finput" required>
+            </div>
+            <div>
+              <label class="flabel">Tipo</label>
+              <select id="tipo" class="finput">
+                <option value="entrada">💰 Entrada (+)</option>
+                <option value="saida">💸 Saída (-)</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-bottom:24px;">
+            <label class="flabel">Categoria (opcional)</label>
+            <select id="categoria" class="finput">
+              <option value="">— Selecionar categoria —</option>
+              <option value="Alimentação">🍔 Alimentação</option>
+              <option value="Transporte">🚗 Transporte</option>
+              <option value="Moradia">🏠 Moradia</option>
+              <option value="Saúde">💊 Saúde</option>
+              <option value="Lazer">🎮 Lazer</option>
+              <option value="Educação">📚 Educação</option>
+              <option value="Trabalho">💼 Trabalho</option>
+              <option value="Outros">📦 Outros</option>
+            </select>
+          </div>
+          <button type="submit" class="fbtn" id="btn-salvar">💾 Salvar no Firebase</button>
+        </form>
+      </div>
+    </div>
 
-        // Carregamento Inicial
-        renderizarLista();
-        atualizarResumo();
-    </script>
+    <!-- ── PAGE: HISTÓRICO ── -->
+    <div id="page-hist" class="page">
+      <div class="panel" style="overflow:hidden;">
+        <div style="padding:20px 24px;border-bottom:1px solid #f8fafc;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+          <div>
+            <h3 style="font-size:15px;font-weight:700;color:#0f172a;">Histórico Completo</h3>
+            <p style="font-size:12px;color:#94a3b8;" id="hist-count">0 transações</p>
+          </div>
+          <button onclick="limparTudo()" style="font-size:12px;font-weight:700;color:#ef4444;background:none;border:none;cursor:pointer;">🗑 Limpar Tudo</button>
+        </div>
+        <div style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;">
+            <thead>
+              <tr style="background:#f8fafc;">
+                <th style="padding:12px 20px;text-align:left;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;">Descrição</th>
+                <th style="padding:12px 20px;text-align:left;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;">Categoria</th>
+                <th style="padding:12px 20px;text-align:center;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;">Tipo</th>
+                <th style="padding:12px 20px;text-align:right;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;">Valor</th>
+                <th style="padding:12px 20px;text-align:center;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;">Ação</th>
+              </tr>
+            </thead>
+            <tbody id="lista-transacoes"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main-wrap -->
+
+  <!-- IA WIDGET -->
+  <div id="ia-widget">
+    <div id="ia-panel">
+      <div id="ia-panel-header">
+        <div style="width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:18px;">🤖</div>
+        <div>
+          <div class="ia-title">IA Financeira</div>
+          <div class="ia-status" id="ia-status-label">Configure a API Key para ativar</div>
+        </div>
+        <button onclick="toggleIA()" style="background:rgba(255,255,255,0.15);border:none;border-radius:8px;color:white;padding:4px 10px;cursor:pointer;font-size:13px;">✕</button>
+      </div>
+      <div id="ia-messages"></div>
+      <div id="ia-input-wrap">
+        <input id="ia-input" type="text" placeholder="Pergunte sobre seus gastos..." onkeydown="if(event.key==='Enter')enviarMsgIA()">
+        <button onclick="enviarMsgIA()">➤</button>
+      </div>
+    </div>
+    <button id="ia-bubble" onclick="toggleIA()" title="IA Financeira">
+      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    </button>
+  </div>
+
+</div><!-- /app-screen -->
+
+<!-- ══════════════════════════════════════
+     FIREBASE + LÓGICA
+══════════════════════════════════════ -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+         onAuthStateChanged, signOut, updateProfile }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, collection, addDoc, onSnapshot, deleteDoc,
+         doc, getDocs, query, orderBy, where, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+/* ── Firebase ── */
+const fbApp = initializeApp({
+  apiKey:"AIzaSyDoNGLRTPtvCnsMGEcA3JAyrQjlwue6vt0",
+  authDomain:"subcontrol-e6dac.firebaseapp.com",
+  projectId:"subcontrol-e6dac",
+  storageBucket:"subcontrol-e6dac.firebasestorage.app",
+  messagingSenderId:"461050024495",
+  appId:"1:461050024495:web:3a29f0bf35d542af68ecda"
+});
+const auth = getAuth(fbApp);
+const db   = getFirestore(fbApp);
+
+/* ── State ── */
+let transacoes = [];
+let donutChart, barChart;
+let iaConfig = JSON.parse(localStorage.getItem('ia_cfg') || '{}');
+let ME = null;
+let unsubTransacoes = null;
+let limiteAlertado = false;
+
+/* ── Expõe funções para HTML ── */
+window.fazerLogin    = fazerLogin;
+window.fazerCadastro = fazerCadastro;
+window.trocarAuth    = trocarAuth;
+window.navTo         = navTo;
+window.limparTudo    = limparTudo;
+window.removerItem   = removerItem;
+window.toggleIA      = toggleIA;
+window.enviarMsgIA   = enviarMsgIA;
+window.abrirConfig   = abrirConfig;
+window.fecharConfig  = fecharConfig;
+window.salvarConfig  = salvarConfig;
+window.atualizarLinkAPI = atualizarLinkAPI;
+
+/* ══════════════════════════════
+   AUTH
+══════════════════════════════ */
+function trocarAuth(para) {
+  document.getElementById('view-login').style.display    = para==='login'    ? '' : 'none';
+  document.getElementById('view-register').style.display = para==='register' ? '' : 'none';
+  document.getElementById('l-err').classList.remove('show');
+  document.getElementById('r-err').classList.remove('show');
+}
+
+async function fazerLogin() {
+  const email = document.getElementById('l-email').value.trim();
+  const pass  = document.getElementById('l-pass').value;
+  const err   = document.getElementById('l-err');
+  const btn   = document.getElementById('btn-login');
+  if (!email || !pass) { showErr(err,'Preencha todos os campos.'); return; }
+  btn.disabled = true; btn.innerHTML = '<span class="spin"></span>';
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+  } catch(e) {
+    showErr(err, traduzirErroAuth(e.code));
+    btn.disabled = false; btn.textContent = 'Entrar';
+  }
+}
+
+async function fazerCadastro() {
+  const name  = document.getElementById('r-name').value.trim();
+  const email = document.getElementById('r-email').value.trim();
+  const pass  = document.getElementById('r-pass').value;
+  const err   = document.getElementById('r-err');
+  const btn   = document.getElementById('btn-register');
+  if (!name || !email || !pass) { showErr(err,'Preencha todos os campos.'); return; }
+  if (pass.length < 6) { showErr(err,'Senha mínimo 6 caracteres.'); return; }
+  btn.disabled = true; btn.innerHTML = '<span class="spin"></span>';
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    await updateProfile(cred.user, { displayName: name });
+  } catch(e) {
+    showErr(err, traduzirErroAuth(e.code));
+    btn.disabled = false; btn.textContent = 'Criar Conta';
+  }
+}
+
+onAuthStateChanged(auth, user => {
+  if (user) {
+    ME = user;
+    document.getElementById('auth-screen').style.display  = 'none';
+    document.getElementById('app-screen').style.display   = 'block';
+    const nome = user.displayName || user.email.split('@')[0];
+    document.getElementById('user-name-top').textContent  = nome;
+    document.getElementById('user-av').textContent        = nome[0].toUpperCase();
+    document.getElementById('user-greeting').textContent  = `Olá, ${nome}! 👋`;
+    document.getElementById('btn-sair').onclick = () => {
+      if (confirm('Deseja sair?')) { unsubTransacoes?.(); signOut(auth); }
+    };
+    carregarTransacoes();
+    if (iaConfig.apiKey) document.getElementById('ia-status-label').textContent = 'IA ativa ✓';
+  } else {
+    ME = null;
+    document.getElementById('auth-screen').style.display = 'flex';
+    document.getElementById('app-screen').style.display  = 'none';
+    document.getElementById('btn-login').disabled   = false;
+    document.getElementById('btn-login').textContent = 'Entrar';
+    document.getElementById('btn-register').disabled   = false;
+    document.getElementById('btn-register').textContent = 'Criar Conta';
+  }
+});
+
+function traduzirErroAuth(code) {
+  const m = {
+    'auth/user-not-found':'E-mail não cadastrado.',
+    'auth/wrong-password':'Senha incorreta.',
+    'auth/invalid-credential':'E-mail ou senha incorretos.',
+    'auth/email-already-in-use':'E-mail já em uso.',
+    'auth/too-many-requests':'Muitas tentativas. Aguarde.',
+    'auth/network-request-failed':'Sem conexão.'
+  };
+  return m[code] || 'Erro: ' + code;
+}
+
+function showErr(el, msg) { el.textContent = msg; el.classList.add('show'); }
+
+/* ══════════════════════════════
+   FIRESTORE
+══════════════════════════════ */
+function carregarTransacoes() {
+  if (!ME) return;
+  unsubTransacoes?.();
+  const colRef = collection(db, 'users', ME.uid, 'transacoes');
+  const q      = query(colRef, orderBy('ts','desc'));
+  unsubTransacoes = onSnapshot(q, snap => {
+    transacoes = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderAll();
+    document.getElementById('sync-status').textContent = '✅ Sincronizado';
+  }, () => {
+    document.getElementById('sync-status').textContent = '❌ Erro de conexão';
+  });
+}
+
+document.getElementById('form-transacao').addEventListener('submit', async e => {
+  e.preventDefault();
+  if (!ME) return;
+  const desc  = document.getElementById('desc').value.trim();
+  const valor = parseFloat(document.getElementById('valor').value);
+  const tipo  = document.getElementById('tipo').value;
+  const cat   = document.getElementById('categoria').value;
+  if (!desc || isNaN(valor) || valor <= 0) return;
+  const btn = document.getElementById('btn-salvar');
+  btn.disabled = true; btn.textContent = 'Salvando...';
+  try {
+    await addDoc(collection(db,'users',ME.uid,'transacoes'), { desc, valor, tipo, categoria: cat, ts: serverTimestamp() });
+    document.getElementById('form-transacao').reset();
+    navTo('dashboard');
+    if (tipo === 'saida') analisarComIA({ desc, valor, tipo }, 'nova_transacao');
+  } catch(err) { alert('Erro: ' + err.message); }
+  btn.disabled = false; btn.textContent = '💾 Salvar no Firebase';
+});
+
+async function removerItem(id) {
+  if (!ME || !confirm('Remover esta transação?')) return;
+  await deleteDoc(doc(db,'users',ME.uid,'transacoes',id));
+}
+
+async function limparTudo() {
+  if (!ME || !confirm('Apagar TODAS as transações?')) return;
+  const snap = await getDocs(collection(db,'users',ME.uid,'transacoes'));
+  await Promise.all(snap.docs.map(d => deleteDoc(doc(db,'users',ME.uid,'transacoes',d.id))));
+}
+
+/* ══════════════════════════════
+   RENDER
+══════════════════════════════ */
+function renderAll() {
+  const entradas = transacoes.filter(t=>t.tipo==='entrada').reduce((a,t)=>a+t.valor,0);
+  const saidas   = transacoes.filter(t=>t.tipo==='saida').reduce((a,t)=>a+t.valor,0);
+  const saldo    = entradas - saidas;
+
+  // Cards
+  document.getElementById('c-entradas').textContent = fmt(entradas);
+  document.getElementById('c-saidas').textContent   = fmt(saidas);
+  document.getElementById('c-saldo').textContent    = fmt(saldo);
+  document.getElementById('c-total').textContent    = transacoes.length;
+  document.getElementById('c-saldo').style.color    = saldo >= 0 ? '#1e40af' : '#991b1b';
+
+  // Gráficos
+  renderDonut(entradas, saidas, saldo);
+  renderBarras();
+
+  // Mini lista
+  renderMiniLista();
+
+  // Tabela histórico
+  renderHistorico();
+
+  // Barra de limite
+  atualizarBarraLimite(saidas);
+
+  // Verificação automática IA
+  verificarLimiteAuto(saidas, entradas);
+}
+
+function renderDonut(entradas, saidas, saldo) {
+  const ctx = document.getElementById('grafico-donut').getContext('2d');
+  if (donutChart) donutChart.destroy();
+  const vazio = entradas === 0 && saidas === 0;
+  donutChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Entradas','Saídas'],
+      datasets: [{
+        data: vazio ? [1,0] : [entradas, saidas],
+        backgroundColor: vazio ? ['#e2e8f0','#e2e8f0'] : ['#10b981','#ef4444'],
+        borderWidth: 6, borderColor: '#ffffff', hoverOffset: 8
+      }]
+    },
+    options: { cutout:'72%', plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label: c => ' ' + fmt(c.raw) } } } }
+  });
+  document.getElementById('donut-saldo-label').textContent = fmt(Math.abs(saldo));
+  document.getElementById('donut-saldo-label').style.color = saldo >= 0 ? '#065f46' : '#991b1b';
+}
+
+function renderBarras() {
+  const ctx = document.getElementById('grafico-barras').getContext('2d');
+  if (barChart) barChart.destroy();
+  const ultimas = [...transacoes].slice(0,6).reverse();
+  if (!ultimas.length) return;
+  barChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ultimas.map(t => t.desc.length > 10 ? t.desc.slice(0,10)+'…' : t.desc),
+      datasets: [{
+        data: ultimas.map(t => t.valor),
+        backgroundColor: ultimas.map(t => t.tipo==='entrada' ? 'rgba(16,185,129,0.8)' : 'rgba(239,68,68,0.8)'),
+        borderRadius: 8, borderSkipped: false
+      }]
+    },
+    options: {
+      plugins:{ legend:{ display:false } },
+      scales:{
+        y:{ grid:{ color:'#f1f5f9' }, ticks:{ color:'#94a3b8', font:{ size:10 }, callback: v => 'R$'+v } },
+        x:{ grid:{ display:false }, ticks:{ color:'#94a3b8', font:{ size:10 } } }
+      }
+    }
+  });
+}
+
+function renderMiniLista() {
+  const el = document.getElementById('mini-lista');
+  const itens = transacoes.slice(0,5);
+  if (!itens.length) { el.innerHTML = '<p style="text-align:center;padding:24px;color:#94a3b8;font-size:13px;">Nenhuma transação ainda.</p>'; return; }
+  el.innerHTML = itens.map(t => `
+    <div class="tbl-row" style="display:flex;align-items:center;padding:12px 24px;gap:14px;">
+      <div style="width:38px;height:38px;border-radius:10px;background:${t.tipo==='entrada'?'#ecfdf5':'#fff1f2'};
+        display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">
+        ${t.tipo==='entrada'?'💰':'💸'}
+      </div>
+      <div style="flex:1;min-width:0;">
+        <p style="font-size:13px;font-weight:600;color:#1e293b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(t.desc)}</p>
+        <p style="font-size:11px;color:#94a3b8;">${t.categoria||t.tipo}</p>
+      </div>
+      <div style="font-size:14px;font-weight:700;color:${t.tipo==='entrada'?'#059669':'#dc2626'};flex-shrink:0;">
+        ${t.tipo==='entrada'?'+':'-'} ${fmt(t.valor)}
+      </div>
+    </div>`).join('');
+}
+
+function renderHistorico() {
+  const tbody = document.getElementById('lista-transacoes');
+  document.getElementById('hist-count').textContent = transacoes.length + ' transações';
+  if (!transacoes.length) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:32px;color:#94a3b8;font-size:13px;">Nenhuma transação registrada.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = transacoes.map(t => `
+    <tr class="tbl-row">
+      <td style="padding:14px 20px;font-size:13px;font-weight:600;color:#1e293b;">${esc(t.desc)}</td>
+      <td style="padding:14px 20px;font-size:12px;color:#64748b;">${t.categoria||'—'}</td>
+      <td style="padding:14px 20px;text-align:center;">
+        <span class="badge" style="background:${t.tipo==='entrada'?'#ecfdf5':'#fff1f2'};color:${t.tipo==='entrada'?'#059669':'#dc2626'};">
+          ${t.tipo==='entrada'?'ENTRADA':'SAÍDA'}
+        </span>
+      </td>
+      <td style="padding:14px 20px;text-align:right;font-weight:700;font-size:13px;color:${t.tipo==='entrada'?'#059669':'#dc2626'};">
+        ${t.tipo==='entrada'?'+':'-'} ${fmt(t.valor)}
+      </td>
+      <td style="padding:14px 20px;text-align:center;">
+        <button onclick="removerItem('${t.id}')" style="background:none;border:none;cursor:pointer;color:#fca5a5;font-size:18px;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#fca5a5'">🗑</button>
+      </td>
+    </tr>`).join('');
+}
+
+/* ══════════════════════════════
+   NAV
+══════════════════════════════ */
+function navTo(page) {
+  ['dashboard','add','hist'].forEach(p => {
+    document.getElementById('page-'+p).classList.remove('active');
+    const btn = document.getElementById('sn-'+p);
+    if (btn) btn.classList.remove('active');
+  });
+  document.getElementById('page-'+page).classList.add('active');
+  const btn = document.getElementById('sn-'+page);
+  if (btn) btn.classList.add('active');
+  const titles = { dashboard:'Dashboard', add:'Nova Transação', hist:'Histórico' };
+  document.getElementById('page-title').textContent = titles[page] || '';
+}
+
+/* ══════════════════════════════
+   BARRA LIMITE
+══════════════════════════════ */
+function atualizarBarraLimite(saidas) {
+  const lim = parseFloat(iaConfig.limit || 0);
+  const box = document.getElementById('limit-box');
+  if (!lim) { box.style.display = 'none'; return; }
+  box.style.display = '';
+  const pct = Math.min((saidas / lim) * 100, 100);
+  const fill = document.getElementById('lbar-fill');
+  fill.style.width = pct + '%';
+  fill.className = 'lbar-fill ' + (pct >= 100 ? 'bg-red-500' : pct >= 80 ? 'bg-yellow-500' : 'bg-green-500');
+  document.getElementById('lbar-label').textContent = `${fmt(saidas)} / ${fmt(lim)} (${pct.toFixed(0)}%)`;
+  document.getElementById('lbar-label').style.color = pct >= 100 ? '#dc2626' : pct >= 80 ? '#d97706' : '#475569';
+}
+
+/* ══════════════════════════════
+   IA FINANCEIRA
+══════════════════════════════ */
+function verificarLimiteAuto(saidas, entradas) {
+  const lim = parseFloat(iaConfig.limit || 0);
+  if (!lim || !iaConfig.apiKey) return;
+  const pct = (saidas / lim) * 100;
+  if (pct >= 100 && !limiteAlertado) {
+    limiteAlertado = true;
+    showToast(`Você ULTRAPASSOU o limite de ${fmt(lim)}! Saídas: ${fmt(saidas)}.`);
+    analisarComIA({ saidas, entradas, lim, pct }, 'limite_ultrapassado');
+  } else if (pct < 100) { limiteAlertado = false; }
+}
+
+async function analisarComIA(dados, ctx) {
+  if (!iaConfig.apiKey) return;
+  const saidas   = transacoes.filter(t=>t.tipo==='saida').reduce((a,t)=>a+t.valor,0);
+  const entradas = transacoes.filter(t=>t.tipo==='entrada').reduce((a,t)=>a+t.valor,0);
+  const lim      = parseFloat(iaConfig.limit||0);
+  let prompt = '';
+
+  if (ctx === 'nova_transacao') {
+    const outros = transacoes.filter(t=>t.tipo==='saida').slice(1).map(t=>t.valor);
+    const media  = outros.length ? outros.reduce((a,b)=>a+b,0)/outros.length : 0;
+    prompt = `Você é um assistente financeiro objetivo. Analise este novo gasto:
+- Descrição: "${dados.desc}"
+- Valor: R$ ${dados.valor.toFixed(2)}
+- Média dos outros gastos: R$ ${media.toFixed(2)}
+- Total de saídas: R$ ${saidas.toFixed(2)}
+- Limite definido: ${lim ? fmt(lim) : 'não definido'}
+- Saldo disponível: ${fmt(entradas-saidas)}
+Se o gasto for muito acima da média OU saldo negativo OU perto/acima do limite, dê aviso curto (2 frases). Se normal, responda apenas: OK`;
+  } else if (ctx === 'limite_ultrapassado') {
+    prompt = `Assistente financeiro: o usuário ultrapassou o limite de ${fmt(dados.lim)}. Gastos: ${fmt(dados.saidas)} (${dados.pct.toFixed(0)}%). Dê um alerta sério e construtivo em 2 frases em português.`;
+  }
+
+  try {
+    const resp = await chamarIA(prompt);
+    if (!resp || resp.trim() === 'OK') return;
+    showToast(resp);
+    addMsgIA(resp, 'alert');
+    document.getElementById('ia-panel').classList.add('open');
+  } catch(e) { console.warn('IA:', e.message); }
+}
+
+async function chamarIA(prompt) {
+  const { provider, apiKey } = iaConfig;
+  if (!provider || !apiKey) throw new Error('IA não configurada');
+  if (provider === 'gemini') {
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ contents:[{ parts:[{ text: prompt }] }] })
+    });
+    const d = await r.json();
+    if (d.error) throw new Error(d.error.message);
+    return d.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  }
+  if (provider === 'groq') {
+    const r = await fetch('https://api.groq.com/openai/v1/chat/completions',{
+      method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},
+      body: JSON.stringify({ model:'llama3-8b-8192', messages:[
+        { role:'system', content:'Você é um assistente financeiro pessoal. Responda sempre em português.' },
+        { role:'user', content: prompt }
+      ], max_tokens:300 })
+    });
+    const d = await r.json();
+    if (d.error) throw new Error(d.error.message);
+    return d.choices?.[0]?.message?.content || '';
+  }
+}
+
+function toggleIA() {
+  const p = document.getElementById('ia-panel');
+  p.classList.toggle('open');
+  if (p.classList.contains('open') && !document.getElementById('ia-messages').children.length) {
+    addMsgIA('Olá! 👋 Sou sua consultora financeira com IA. Posso analisar seus gastos, detectar padrões e alertar quando algo estiver errado. Configure sua API Key no botão 🤖 para me ativar completamente!', 'bot');
+  }
+}
+
+async function enviarMsgIA() {
+  const inp = document.getElementById('ia-input');
+  const txt = inp.value.trim();
+  if (!txt) return;
+  inp.value = '';
+  addMsgIA(txt, 'user');
+  if (!iaConfig.apiKey) { addMsgIA('⚠️ Configure sua API Key primeiro no botão 🤖 no menu lateral.', 'bot'); return; }
+
+  const saidas   = transacoes.filter(t=>t.tipo==='saida').reduce((a,t)=>a+t.valor,0);
+  const entradas = transacoes.filter(t=>t.tipo==='entrada').reduce((a,t)=>a+t.valor,0);
+  const lim      = parseFloat(iaConfig.limit||0);
+  const hist     = transacoes.slice(0,8).map(t=>`${t.tipo==='entrada'?'+':'-'} R$${t.valor.toFixed(2)} (${t.desc})`).join('\n');
+
+  const prompt = `Você é um assistente financeiro pessoal. Dados do usuário:
+- Entradas: ${fmt(entradas)} | Saídas: ${fmt(saidas)} | Saldo: ${fmt(entradas-saidas)}
+- Limite mensal: ${lim ? fmt(lim) : 'não definido'}
+- Últimas transações:\n${hist || 'nenhuma'}
+
+Pergunta: "${txt}"
+Responda em português, direto e útil, máximo 4 frases.`;
+
+  const typing = addTyping();
+  try {
+    const resp = await chamarIA(prompt);
+    typing.remove();
+    addMsgIA(resp || 'Não consegui responder.', 'bot');
+  } catch(e) { typing.remove(); addMsgIA('❌ Erro: '+e.message, 'bot'); }
+}
+
+function addMsgIA(txt, tipo) {
+  const msgs = document.getElementById('ia-messages');
+  const d = document.createElement('div');
+  d.className = tipo==='user' ? 'ia-user' : tipo==='alert' ? 'ia-alert' : 'ia-bot';
+  d.textContent = txt;
+  msgs.appendChild(d);
+  msgs.scrollTop = msgs.scrollHeight;
+  return d;
+}
+function addTyping() {
+  const msgs = document.getElementById('ia-messages');
+  const d = document.createElement('div');
+  d.className = 'ia-bot ia-dots';
+  d.innerHTML = '<span></span><span></span><span></span>';
+  msgs.appendChild(d);
+  msgs.scrollTop = msgs.scrollHeight;
+  return d;
+}
+
+/* ══════════════════════════════
+   TOAST
+══════════════════════════════ */
+let _toastT;
+function showToast(msg) {
+  document.getElementById('ia-toast-msg').textContent = msg;
+  document.getElementById('ia-toast').classList.add('show');
+  clearTimeout(_toastT);
+  _toastT = setTimeout(()=>document.getElementById('ia-toast').classList.remove('show'), 7000);
+}
+
+/* ══════════════════════════════
+   CONFIG
+══════════════════════════════ */
+function abrirConfig() {
+  document.getElementById('cfg-provider').value = iaConfig.provider||'gemini';
+  document.getElementById('cfg-apikey').value   = iaConfig.apiKey||'';
+  document.getElementById('cfg-limit').value    = iaConfig.limit||'';
+  atualizarLinkAPI();
+  document.getElementById('cfg-overlay').classList.add('open');
+}
+function fecharConfig() { document.getElementById('cfg-overlay').classList.remove('open'); }
+function salvarConfig() {
+  iaConfig = {
+    provider: document.getElementById('cfg-provider').value,
+    apiKey:   document.getElementById('cfg-apikey').value.trim(),
+    limit:    document.getElementById('cfg-limit').value
+  };
+  localStorage.setItem('ia_cfg', JSON.stringify(iaConfig));
+  fecharConfig();
+  if (iaConfig.apiKey) document.getElementById('ia-status-label').textContent = 'IA ativa ✓';
+  const saidas = transacoes.filter(t=>t.tipo==='saida').reduce((a,t)=>a+t.valor,0);
+  atualizarBarraLimite(saidas);
+  showToast('✅ IA Financeira ativada com sucesso! Monitorando seus gastos.');
+}
+function atualizarLinkAPI() {
+  const p = document.getElementById('cfg-provider').value;
+  const l = document.getElementById('cfg-link');
+  if (p==='gemini') { l.textContent='🔑 Obter chave gratuita em aistudio.google.com'; l.onclick=()=>window.open('https://aistudio.google.com/app/apikey','_blank'); }
+  else              { l.textContent='🔑 Obter chave gratuita em console.groq.com';   l.onclick=()=>window.open('https://console.groq.com/keys','_blank'); }
+}
+
+/* ── Helpers ── */
+function fmt(v){ return `R$ ${(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2})}`; }
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// Inicializa link API
+atualizarLinkAPI();
+</script>
 </body>
 </html>
